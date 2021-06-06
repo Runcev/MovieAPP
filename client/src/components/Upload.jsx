@@ -49,26 +49,29 @@ class Upload extends Component {
 
     }
 
-    onClickHandler = (event) => {
-        const data = new FormData()
-        data.append('file', this.state.selectedFile)
-        axios.post("http://localhost:5000/upload", data, {
-            onUploadProgress: ProgressEvent => {
-                this.setState({
-                    loaded: (ProgressEvent.loaded / ProgressEvent.total*100),
+    onClickHandler = () => {
+        if(this.state.selectedFile != null){
+            const data = new FormData()
+            data.append('file', this.state.selectedFile)
+            axios.post("http://localhost:5000/upload", data, {
+                onUploadProgress: ProgressEvent => {
+                    this.setState({
+                        loaded: (ProgressEvent.loaded / ProgressEvent.total*100),
+                    })
+                },
+            })
+                .then(res => { // then print response status
+                    toast.success('upload success')
                 })
-            },
-        })
-            .then(res => { // then print response status
-                toast.success('upload success')
-            })
-            .catch(err => { // then print response status
-                toast.error('upload fail')
-            })
-        this.state.selectedFile = null
+                .catch(err => { // then print response status
+                    toast.error('upload fail')
+                })
+            this.state.selectedFile = null
+        }
+        toast.error('Choose file')
     }
 
-    render(x) {
+    render() {
         return (
             <div style={{marginTop: 20}}>
                 <h1>Create movie from file</h1>
