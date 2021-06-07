@@ -3,7 +3,7 @@ const fs = require('fs')
 const getDataFromFile = function () {
     let data;
     try {
-        data = fs.readFileSync('C:/Users/miki/WebstormProjects/movieapp/server/utils/moviesData.txt')
+        data = fs.readFileSync('server/utils/moviesData.txt')
     } catch (err) {
         console.error(err)
     }
