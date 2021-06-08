@@ -1,9 +1,25 @@
 const Movie = require('../models/movieModel')
 const getDataFromFile = require('../utils/fileReader')
 
-createMovie = (req, res) => {
+createMovie = async (req, res) => {
     const { title, releaseYear, format, stars } = req.body
 
+    const movieExists = await Movie.find(
+        {$and: [
+                {
+                    title: title,
+                    releaseYear: releaseYear,
+                    format: format,
+                    stars: stars,
+                }
+            ]})
+
+    if (movieExists.length !== 0) {
+        return res.status(409).json({
+            success: false,
+            error: 'Movie already exists',
+        })
+    }
 
     if (!req.body) {
         return res.status(400).json({
@@ -41,8 +57,6 @@ createMovie = (req, res) => {
 }
 
 createMovieFromFile = async (req, res) =>{
-    console.log('FromFile')
-
     const data = getDataFromFile.getDataFromFile()
 
     for (let i = 0; i < data[0].length; i++ ){
@@ -51,32 +65,46 @@ createMovieFromFile = async (req, res) =>{
         const format = data[2][i]
         const stars = data[3][i]
 
-        const movie = new Movie({
-            title,
-            releaseYear,
-            format,
-            stars
-        })
+        const movieExists = await Movie.find(
+            {$and: [
+                    {
+                        title: title,
+                        releaseYear: releaseYear,
+                        format: format,
+                        stars: stars,
+                    }
+                ]})
 
-        if (!movie) {
-            return res.status(400).json({ success: false, error: err })
+        if(movieExists.length === 0) {
+            const movie = new Movie({
+                title,
+                releaseYear,
+                format,
+                stars
+            })
+
+            if (!movie) {
+                return res.status(400).json({ success: false, error: err })
+            }
+
+            movie
+                .save()
+                .then(() => {
+                    return res.status(201).json({
+                        success: true,
+                        id: movie._id,
+                        message: 'Movie created!',
+                    })
+                })
+                .catch(error => {
+                    return res.status(400).json({
+                        error,
+                        message: 'Movie not created!',
+                    })
+                })
         }
 
-        movie
-            .save()
-            .then(() => {
-                return res.status(201).json({
-                    success: true,
-                    id: movie._id,
-                    message: 'Movie created!',
-                })
-            })
-            .catch(error => {
-                return res.status(400).json({
-                    error,
-                    message: 'Movie not created!',
-                })
-            })
+
     }
 }
 
