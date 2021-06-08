@@ -29,8 +29,10 @@
   transform: scale(1.03);
 }
 
-.form-control {
-  background-color: #373b69;
+.form-select, .form-control {
+  background-color: #373b69 !important;
+  color: white !important;
+  margin: 5px;
 }
 
 header{
@@ -96,4 +98,14 @@ header{
 
 .movie:hover .movie-over{
   transform: translateY(0%);
+}
+
+.pagination {
+  justify-content: center;
+}
+
+.page-link{
+  margin-top: 1rem;
+  background-color: #373b69 !important;
+  border-color: #22254b !important;
 }

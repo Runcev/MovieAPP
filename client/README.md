@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # MovieApp
 test task for WebbyLab
 =======
