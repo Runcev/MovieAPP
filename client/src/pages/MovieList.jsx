@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import api from '../api'
 import Movie from "../components/Movie";
+import Paginate from "../components/Paginate";
 
 
 const MovieList = () => {
@@ -9,6 +10,9 @@ const MovieList = () => {
     const [clicked, setClicked] = useState(false)
     const [searchTitleTerm, setSearchTitleTerm] = useState('')
     const [searchStarsTerm, setSearchStarsTerm] = useState('')
+    const [currentPage, setCurrentPage] = useState(1)
+    const [moviesPerPage, setMoviesPerPage] = useState(12)
+
     useEffect( () => {
         api.getAllMovies()
             .then(movies => {
@@ -77,6 +81,12 @@ const MovieList = () => {
         setMovies(sorted)
     }
 
+    const indexOfLastMovie = currentPage * moviesPerPage;
+    const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
+    const currentMovies = movies.slice(indexOfFirstMovie, indexOfLastMovie)
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber)
+
     return (
         <>
             <header>
@@ -106,10 +116,15 @@ const MovieList = () => {
                 </form>
             </header>
             <div className="movie-container">
-                {movies.length > 0 && movies.map(movie => (
+                {currentMovies.length > 0 && currentMovies.map(movie => (
                     <Movie key={movie._id} {...movie} />)
                 )}
             </div>
+            <Paginate
+                moviesPerPage={moviesPerPage}
+                totalMovies={movies.length}
+                paginate={paginate}/>
+
         </>
     )
 }
