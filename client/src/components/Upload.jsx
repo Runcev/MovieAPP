@@ -32,9 +32,14 @@ class Upload extends Component {
         let size = 2000000
         let err = [];
         if (file.size > size) {
-            err[0] = file.type + ' is too large, please pick a smaller file\n';
+            err[0] = 'is too large, please pick a smaller file\n';
             toast.error(err[0])
-            event.target.value = null
+            return
+        }
+        if(file.size === 0){
+            err[1] = 'file could not be empty, please pick other file\n';
+            toast.error(err[1])
+            return
         }
         return true;
     }
@@ -46,7 +51,6 @@ class Upload extends Component {
                 loaded: 0,
             })
         }
-
     }
 
     onClickHandler = () => {
@@ -68,7 +72,10 @@ class Upload extends Component {
                 })
             this.state.selectedFile = null
         }
-        toast.error('Choose file')
+        else {
+            toast.error('Choose file')
+        }
+
     }
 
     render() {
