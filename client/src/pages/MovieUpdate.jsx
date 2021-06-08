@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import api from '../api'
-
 import styled from 'styled-components'
+import validate from "../utils/validator";
 
 const Title = styled.h1.attrs({
     className: 'h1',
@@ -15,14 +15,6 @@ const Wrapper = styled.div.attrs({
 `
 
 const Label = styled.label`
-  margin: 5px;
-`
-
-const InputText = styled.input.attrs({
-    className: 'form-control',
-})`
-  background-color: #373b69;
-  color: white;
   margin: 5px;
 `
 
@@ -48,6 +40,7 @@ class MoviesUpdate extends Component {
             releaseYear: '',
             format: '',
             stars: '',
+            isValidData: true,
         }
     }
 
@@ -57,7 +50,9 @@ class MoviesUpdate extends Component {
     }
 
     handleChangeInputReleaseTear = async event => {
-        const releaseYear = event.target.value
+        const releaseYear =
+            event.target.value.replace(/[^0-9]/gi, "").replace(/^0+/g, "") || "";
+
         this.setState({ releaseYear })
     }
 
@@ -67,23 +62,28 @@ class MoviesUpdate extends Component {
     }
 
     handleChangeInputStars = async event => {
-        const stars = event.target.value
-        this.setState({ stars })
+        const stars =
+            event.target.value.replace(/[^a-zA-Z- ,]/gi, "")
+
+        this.setState({stars})
     }
 
     handleUpdateMovie = async () => {
         const { id, title, releaseYear, format, stars } = this.state
         const payload = { title, releaseYear, format, stars }
+        const isValidData = validate(title, releaseYear, stars)
 
-        await api.updateMovieById(id, payload).then(res => {
-            toast.success('Movie updated successfully')
-            this.setState({
-                title: '',
-                releaseYear: '',
-                format: '',
-                stars: '',
+        if(isValidData){
+            await api.updateMovieById(id, payload).then(res => {
+                toast.success('Movie updated successfully')
+                /*this.setState({
+                    title: '',
+                    releaseYear: '',
+                    format: '',
+                    stars: '',
+                })*/
             })
-        })
+        }
     }
 
     componentDidMount = async () => {
@@ -106,34 +106,30 @@ class MoviesUpdate extends Component {
 
                 <Title>Create Movie</Title>
 
-                <Label>Title: </Label>
-                <InputText
+                <Label>*Title: </Label>
+                <input className="form-control"
                     type="text"
                     value={title}
                     onChange={this.handleChangeInputTitle}
                 />
 
-                <Label>Release Year: </Label>
-                <InputText
-                    type="number"
-                    step="1"
-                    lang="en-US"
-                    min="0"
-                    max="10"
-                    pattern="[0-9]+([,\.][0-9]+)?"
+                <Label>*Release Year: </Label>
+                <input className="form-control"
+                    type="text"
                     value={releaseYear}
                     onChange={this.handleChangeInputReleaseTear}
                 />
 
-                <Label>Format: </Label>
-                <InputText
-                    type="text"
-                    value={format}
-                    onChange={this.handleChangeInputFormat}
-                />
+                <Label>*Format: </Label>
+                <select className="form-select" value={format} onChange={this.handleChangeInputFormat}>
+                    <option value="DVD">DVD</option>
+                    <option value="VHS">VHS</option>
+                    <option value="Blu-Ray">Blu-Ray</option>
+                </select>
 
-                <Label>Stars: </Label>
-                <InputText
+
+                <Label>*Stars: </Label>
+                <input className="form-control"
                     type="text"
                     value={stars}
                     onChange={this.handleChangeInputStars}
